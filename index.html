@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>PACIFIC 🌊</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☮️</text></svg>">
+<style>
+  * { margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: #8ecdf0; touch-action: none; overscroll-behavior: none; }
+  #app { position: fixed; inset: 0; }
+  #app canvas { display: block; }
+  #menu {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(150,205,240,0.25);
+    backdrop-filter: blur(3px);
+    transition: opacity 0.4s ease;
+  }
+  #menu.gone { opacity: 0; pointer-events: none; }
+  #menu-card {
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 34px 48px;
+    text-align: center;
+    color: #14507e;
+    font-family: -apple-system, system-ui, sans-serif;
+    box-shadow: 0 10px 40px rgba(20,80,126,0.25);
+  }
+  #menu-card h1 { font-size: 40px; font-weight: 800; }
+  .menu-sub { margin-top: 4px; font-weight: 700; letter-spacing: 3px; color: #2f8fe6; }
+  .menu-controls { margin: 18px 0 22px; font-size: 14px; line-height: 1.8; color: rgba(20,80,126,0.8); }
+  #start {
+    font: 700 18px -apple-system, system-ui, sans-serif;
+    color: #fff; background: #2f8fe6; border: none; outline: none; border-radius: 999px;
+    padding: 12px 46px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(47,143,230,0.45);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #start:hover { background: #1f80dd; }
+  #start:focus, #start:focus-visible { outline: none; }
+  #credits { margin-top: 12px; font-size: 12px; }
+  #credits a { color: rgba(20,80,126,0.55); text-decoration: underline; cursor: pointer; }
+  #credits-text { color: rgba(20,80,126,0.7); line-height: 1.7; }
+  #credits-text a { color: rgba(20,80,126,0.7); text-decoration: underline; }
+  #mapui {
+    position: fixed; right: 22px; top: 20px; z-index: 5;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+    pointer-events: none; user-select: none;
+  }
+  #minimap, #compass {
+    background: rgba(150,205,240,0.5);
+    border: 1.5px solid rgba(255,255,255,0.85);
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(20,80,126,0.15);
+  }
+  #chestui {
+    position: fixed; left: 22px; top: 20px; z-index: 5;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.85);
+    border-radius: 999px; padding: 8px 16px;
+    backdrop-filter: blur(4px);
+    color: rgba(23,80,126,0.85);
+    font: 700 16px -apple-system, system-ui, sans-serif;
+    pointer-events: none; user-select: none;
+  }
+  #note {
+    position: fixed; left: 50%; top: 44%; transform: translate(-50%, -50%) rotate(-2deg);
+    width: 300px; z-index: 7;
+    background: #fdf6e0;
+    border: 1px solid rgba(160,130,80,0.35);
+    border-radius: 6px;
+    padding: 20px 24px;
+    box-shadow: 0 10px 32px rgba(60,40,10,0.25);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0; transition: opacity 0.35s ease;
+  }
+  #note.show { opacity: 1; }
+  #note-head { font: 700 13px -apple-system, system-ui, sans-serif; color: rgba(120,90,40,0.75); margin-bottom: 10px; }
+  #note-text { font: italic 17px/1.9 Georgia, serif; color: #4a3a1e; white-space: pre-line; }
+  #treasure {
+    position: fixed; inset: 0; z-index: 9;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(150,205,240,0.25);
+    backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  #treasure.show { opacity: 1; pointer-events: auto; }
+  #treasure-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 26px 34px;
+    max-height: 74vh; overflow-y: auto;
+    color: #14507e;
+    font-family: -apple-system, system-ui, sans-serif;
+    box-shadow: 0 10px 40px rgba(20,80,126,0.25);
+    min-width: 340px;
+  }
+  #treasure-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 14px; text-align: center; }
+  .haiku {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid rgba(20,80,126,0.1);
+  }
+  .haiku:last-child { border-bottom: none; }
+  .haiku .hnum { font-weight: 800; color: rgba(23,80,126,0.5); min-width: 20px; }
+  .haiku p { font: italic 14px/1.7 Georgia, serif; color: #4a3a1e; white-space: pre-line; }
+  .haiku.locked p { font-style: normal; font-family: -apple-system, system-ui, sans-serif; color: rgba(20,80,126,0.4); }
+  #page {
+    position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
+    max-width: 460px; z-index: 6;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 16px;
+    padding: 18px 26px;
+    color: #14507e;
+    font-family: -apple-system, system-ui, sans-serif;
+    box-shadow: 0 8px 30px rgba(20,80,126,0.2);
+    pointer-events: none;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  #page.show { opacity: 1; }
+  #page h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  #page p { font-size: 14px; line-height: 1.6; color: rgba(20,80,126,0.85); }
+  #esc {
+    position: fixed; left: 22px; bottom: 20px; z-index: 5;
+    pointer-events: none; user-select: none;
+    font: 600 15px -apple-system, system-ui, sans-serif;
+  }
+  #esc .key.wide { width: auto; padding: 0 16px; height: 40px; }
+  #audioui {
+    position: fixed; left: 22px; bottom: 70px; z-index: 5;
+    display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+    pointer-events: none; user-select: none;
+    font: 600 15px -apple-system, system-ui, sans-serif;
+  }
+  #audioui .key.wide { width: auto; padding: 0 16px; height: 40px; justify-content: flex-start; }
+  .key.muted { opacity: 0.45; text-decoration: line-through; }
+  #stick {
+    position: fixed; width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.45);
+    display: none; pointer-events: none; z-index: 5;
+  }
+  #knob {
+    position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px;
+    border-radius: 50%; background: rgba(255,255,255,0.55);
+  }
+  #dot {
+    position: fixed; left: 50%; top: 50%; width: 6px; height: 6px;
+    margin: -3px 0 0 -3px; border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    box-shadow: 0 0 4px rgba(20,80,126,0.35);
+    pointer-events: none; z-index: 4;
+  }
+  #keys {
+    position: fixed; right: 22px; bottom: 20px; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    pointer-events: none; user-select: none;
+    font: 600 15px -apple-system, system-ui, sans-serif;
+  }
+  .keyrow { display: flex; gap: 6px; }
+  .key {
+    width: 44px; height: 44px; border-radius: 9px;
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.85);
+    color: rgba(23,80,126,0.75);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    line-height: 1; backdrop-filter: blur(4px);
+    box-shadow: 0 2px 6px rgba(20,80,126,0.12);
+    transition: background 0.1s, transform 0.1s;
+  }
+  .key i { font-style: normal; font-size: 10px; opacity: 0.7; margin-bottom: 2px; }
+  .key.active { background: rgba(255,255,255,0.95); transform: translateY(2px); }
+  .key.wide { width: 144px; font-size: 12px; flex-direction: row; gap: 6px; }
+  #keys-label, .ui-label {
+    color: rgba(255,255,255,0.95); font-size: 12px; font-weight: 600;
+    text-shadow: 0 1px 3px rgba(20,80,126,0.4);
+  }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="dot" aria-hidden="true"></div>
+<div id="menu">
+  <div id="menu-card">
+    <h1>hello</h1>
+    <p class="menu-controls">
+      mouse · look around<br>
+      w/s · sail &nbsp;&nbsp; a/d · steer<br>
+      ⇧ shift · boost &nbsp;&nbsp; e · toss blueberries<br>
+      esc · back to this menu
+    </p>
+    <button id="start">start</button>
+    <div id="credits">
+      <a id="credits-link" href="#">credits</a>
+      <span id="credits-text" hidden>
+        made by <a href="https://veganhacktivists.org" target="_blank" rel="noopener">vegan hacktivists</a>
+        and <a href="https://violetstudios.org" target="_blank" rel="noopener">violet studios</a><br>
+        music by <a href="https://pixabay.com/users/clavier-music-16027823/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=310690" target="_blank" rel="noopener">clavier clavier</a>
+        from <a href="https://pixabay.com/music/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=310690" target="_blank" rel="noopener">pixabay</a>
+      </span>
+    </div>
+  </div>
+</div>
+<div id="audioui" aria-hidden="true">
+  <span class="key wide" id="mute-music">1 · mute music</span>
+  <span class="key wide" id="mute-sfx">2 · mute effects</span>
+  <span class="key wide" id="key-treasure">3 · view treasure</span>
+</div>
+<div id="chestui" aria-hidden="true"><span id="chest-count">0/10</span> 🧰</div>
+<div id="mapui" aria-hidden="true">
+  <canvas id="minimap" width="180" height="180"></canvas>
+  <canvas id="compass" width="64" height="64"></canvas>
+</div>
+<div id="note" aria-hidden="true"><div id="note-head">🧰 treasure found</div><p id="note-text"></p></div>
+<div id="treasure"><div id="treasure-card"><h2>🧰 treasure</h2><div id="treasure-list"></div></div></div>
+<div id="esc" aria-hidden="true"><span class="key wide">esc · menu</span></div>
+<div id="page" aria-hidden="true"><h2 id="page-title"></h2><p id="page-text"></p></div>
+<div id="stick"><div id="knob"></div></div>
+<div id="keys" aria-hidden="true">
+  <div class="keyrow"><span class="key" data-k="KeyW"><i>▲</i>w</span></div>
+  <div class="keyrow"><span class="key" data-k="KeyA"><i>◀</i>a</span><span class="key" data-k="KeyS"><i>▼</i>s</span><span class="key" data-k="KeyD"><i>▶</i>d</span></div>
+  <div class="keyrow"><span class="key wide" data-k="Shift">⇧ shift · speed boost</span></div>
+  <div class="keyrow"><span class="key wide" data-k="KeyE">e · toss blueberries</span></div>
+  <div id="keys-label">sail the boat</div>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>
