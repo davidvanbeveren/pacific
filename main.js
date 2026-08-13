@@ -5,7 +5,7 @@ import { makeSky, makeSun, makeClouds, makePacificText, makeEmojiRow } from './s
 import { makeBoat, DECK } from './boat.js';
 import { startAudio, toggleMusic, toggleSfx, playCollect } from './audio.js';
 import { Treasure, HAIKUS } from './treasure.js';
-import { makeIslands, ISLANDS } from './islands.js';
+import { makeIslands, makeFlag, ISLANDS } from './islands.js';
 import { makeKelp, makeLilies } from './flora.js';
 import { SeaLife } from './life.js';
 
@@ -58,6 +58,8 @@ celestial.traverse((o) => {
 scene.add(celestial);
 
 scene.add(makeIslands());
+const flag = makeFlag();
+scene.add(flag.group);
 const kelp = makeKelp();
 scene.add(kelp.group);
 const lilies = makeLilies();
@@ -538,6 +540,7 @@ renderer.setAnimationLoop(() => {
   clouds.update(t);
   kelp.update(t);
   lilies.update(dt, t);
+  flag.update(t);
 
   celestial.position.x = bx;
   celestial.position.z = bz;

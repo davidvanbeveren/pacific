@@ -25,7 +25,7 @@ const SPOTS = [
 export class Treasure {
   constructor(scene) {
     this.scene = scene;
-    this.tex = emojiTexture('🧰', 256);
+    this.tex = emojiTexture('🎁', 256);
     this.count = 0;
     this.chests = SPOTS.map(([x, z], i) => {
       const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.tex, transparent: true }));

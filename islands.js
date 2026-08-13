@@ -85,6 +85,93 @@ export function islandHeight(x, z) {
   return best;
 }
 
+// a white flag with the fund's logo, planted on the "about" island and
+// waving in the wind (traveling-wave vertex shader, hinged at the pole)
+export function makeFlag() {
+  const group = new THREE.Group();
+  const isl = ISLANDS[0];
+  // plant the pole on the sand near the island's edge, on the side that
+  // faces the spawn point so arriving sailors see it first
+  const toSpawn = Math.atan2(-isl.x, -isl.z) - 0.35; // nudged left as seen arriving from spawn
+  const d = isl.r * 0.9;
+  const px = isl.x + Math.sin(toSpawn) * d;
+  const pz = isl.z + Math.cos(toSpawn) * d;
+  const baseY = Math.max(islandHeight(px, pz), 0);
+  const poleH = 18;
+  const pole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.18, 0.24, poleH, 10),
+    new THREE.MeshLambertMaterial({ color: 0xf4f4f4 })
+  );
+  pole.position.set(px, baseY + poleH / 2, pz);
+  group.add(pole);
+  const knob = new THREE.Mesh(
+    new THREE.SphereGeometry(0.45, 12, 10),
+    new THREE.MeshLambertMaterial({ color: 0xf7dd8c })
+  );
+  knob.position.set(px, baseY + poleH + 0.3, pz);
+  group.add(knob);
+
+  // white cloth with the logo drawn once the image loads
+  const c = document.createElement('canvas');
+  c.width = 1024;
+  c.height = 640;
+  const x2 = c.getContext('2d');
+  x2.fillStyle = '#ffffff';
+  x2.fillRect(0, 0, 1024, 640);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const img = new Image();
+  img.onload = () => {
+    const m = 70;
+    const s = Math.min((c.width - m * 2) / img.width, (c.height - m * 2) / img.height);
+    const w = img.width * s;
+    const h = img.height * s;
+    x2.drawImage(img, (c.width - w) / 2, (c.height - h) / 2, w, h);
+    tex.needsUpdate = true;
+  };
+  img.src = './flag-logo.png';
+
+  const geo = new THREE.PlaneGeometry(11, 6.5, 24, 12);
+  geo.translate(5.5, 0, 0); // hinge the cloth at the pole edge
+  const mat = new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,
+    uniforms: { uTime: { value: 0 }, uMap: { value: tex } },
+    vertexShader: `
+      uniform float uTime;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec3 p = position;
+        float w = uv.x; // 0 at the pole, 1 at the free end
+        p.z += (sin(uv.x * 6.0 - uTime * 3.2) * 0.7 + sin(uv.x * 11.0 - uTime * 5.1) * 0.25) * w;
+        p.y += sin(uv.x * 4.0 - uTime * 2.4) * 0.22 * w;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D uMap;
+      varying vec2 vUv;
+      void main() {
+        // flip U on the back face so the logo never reads mirrored
+        vec2 uv2 = gl_FrontFacing ? vUv : vec2(1.0 - vUv.x, vUv.y);
+        gl_FragColor = texture2D(uMap, uv2);
+        #include <colorspace_fragment>
+      }
+    `,
+  });
+  const flag = new THREE.Mesh(geo, mat);
+  flag.position.set(px, baseY + poleH - 3.6, pz);
+  flag.rotation.y = 2.5;
+  group.add(flag);
+  return {
+    group,
+    update(t) {
+      mat.uniforms.uTime.value = t;
+    },
+  };
+}
+
 function speckleTexture(base, layers, strokes) {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
