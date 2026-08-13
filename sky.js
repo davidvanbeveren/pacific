@@ -161,26 +161,13 @@ export function makeSun(pos) {
 }
 
 export function makePacificText() {
-  const W = 2048;
-  const H = 512;
-  const c = document.createElement('canvas');
-  c.width = W;
-  c.height = H;
-  const x = c.getContext('2d');
-  x.textAlign = 'center';
-  x.textBaseline = 'middle';
-  if ('letterSpacing' in x) x.letterSpacing = '8px';
-  x.font = '900 300px "Helvetica Neue", Helvetica, Arial, sans-serif';
-  const g = x.createLinearGradient(0, H / 2 - 150, 0, H / 2 + 150);
-  g.addColorStop(0, 'rgba(243,252,255,0.96)');
-  g.addColorStop(1, 'rgba(185,227,247,0.90)');
-  x.fillStyle = g;
-  x.fillText('PACIFIC', W / 2, H / 2 + 10);
-  const tex = new THREE.CanvasTexture(c);
+  // the supplied wordmark image (2000x573, already soft and translucent —
+  // no extra opacity applied)
+  const tex = new THREE.TextureLoader().load('./wordmark.png');
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
-  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.92, depthWrite: false });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(620, (620 * H) / W), mat);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(620, (620 * 573) / 2000), mat);
   mesh.position.set(0, 195, -720);
   mesh.lookAt(0, 8, 0);
   return mesh;
