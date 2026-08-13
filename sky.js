@@ -71,19 +71,22 @@ export function makePacificText() {
   tex.anisotropy = 8;
   const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(620, (620 * 573) / 2000), mat);
-  mesh.position.set(0, 195, -720);
+  mesh.position.set(0, 265, -720);
   mesh.lookAt(0, 8, 0);
   return mesh;
 }
 
 export function makeEmojiRow() {
   const group = new THREE.Group();
-  const chars = ['🐮', '🐷', '🐔', '🐟', '🦐'];
+  // the supplied emoji images, in row order
+  const files = ['emoji-cow.png', 'emoji-pig.png', 'emoji-chicken.png', 'emoji-fish.png', 'emoji-shrimp.png'];
+  const loader = new THREE.TextureLoader();
   const sprites = [];
-  chars.forEach((ch, i) => {
-    const spr = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: emojiTexture(ch, 512), transparent: true, depthWrite: false })
-    );
+  files.forEach((file, i) => {
+    const tex = loader.load('./' + file);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 8;
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
     spr.position.set((i - 2) * 66, 74, -480);
     spr.scale.set(54, 54, 1);
     spr.userData = { baseY: 74, phase: i * 1.3 };
