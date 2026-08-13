@@ -71,7 +71,7 @@ export function makePacificText() {
   tex.anisotropy = 8;
   const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(620, (620 * 573) / 2000), mat);
-  mesh.position.set(0, 265, -720);
+  mesh.position.set(0, 300, -720);
   mesh.lookAt(0, 8, 0);
   return mesh;
 }
@@ -87,9 +87,9 @@ export function makeEmojiRow() {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-    spr.position.set((i - 2) * 66, 74, -480);
+    spr.position.set((i - 2) * 66, 95, -480);
     spr.scale.set(54, 54, 1);
-    spr.userData = { baseY: 74, phase: i * 1.3 };
+    spr.userData = { baseY: 95, phase: i * 1.3 };
     group.add(spr);
     sprites.push(spr);
   });
