@@ -52,111 +52,14 @@ export function makeSky() {
 }
 
 export function makeSun(pos) {
-  const S = 1024;
-  const c = document.createElement('canvas');
-  c.width = c.height = S;
-  const x = c.getContext('2d');
-  const cx = S / 2;
-  const cy = S / 2;
-
-  // big warm halo — bright and wide so the sun glows far outward
-  let g = x.createRadialGradient(cx, cy, 0, cx, cy, 512);
-  g.addColorStop(0, 'rgba(255,248,210,1)');
-  g.addColorStop(0.2, 'rgba(255,241,180,0.85)');
-  g.addColorStop(0.5, 'rgba(255,237,170,0.45)');
-  g.addColorStop(0.8, 'rgba(255,236,168,0.16)');
-  g.addColorStop(1, 'rgba(255,236,168,0)');
-  x.fillStyle = g;
-  x.fillRect(0, 0, S, S);
-
-  // sharp triangular rays, alternating long/short, with a gap off the disc;
-  // the bottom five are omitted per the logo design
-  x.save();
-  x.translate(cx, cy);
-  x.fillStyle = '#fdf2c0'; // flat, same cream as the logo
-  const N = 16;
-  for (let i = 0; i < N; i++) {
-    if (i >= 6 && i <= 10) continue; // bottom five spikes removed
-    const a = (i / N) * Math.PI * 2 - Math.PI / 2;
-    const long = i % 2 === 0;
-    const len = long ? 400 : 300;
-    const hw = long ? 24 : 19;
-    x.save();
-    x.rotate(a);
-    x.beginPath();
-    x.moveTo(190, -hw);
-    x.lineTo(len, 0);
-    x.lineTo(190, hw);
-    x.closePath();
-    x.fill();
-    x.restore();
-  }
-  x.restore();
-
-  // middle shape: the supplied four-segment peace mark. Build the hard
-  // mask (circle minus peace lines), then blur + threshold the alpha to
-  // round every corner like the logo's soft organic shapes.
-  const seg = document.createElement('canvas');
-  seg.width = seg.height = S;
-  const sx2 = seg.getContext('2d');
-  const R = 150;
-  sx2.fillStyle = '#ffffff';
-  sx2.beginPath();
-  sx2.arc(cx, cy, R, 0, Math.PI * 2);
-  sx2.fill();
-  sx2.globalCompositeOperation = 'destination-out';
-  sx2.lineCap = 'round';
-  sx2.lineWidth = 38;
-  sx2.beginPath();
-  sx2.moveTo(cx, cy - R - 14);
-  sx2.lineTo(cx, cy + R + 14);
-  sx2.stroke();
-  const dd = (R + 14) * Math.SQRT1_2;
-  sx2.beginPath();
-  sx2.moveTo(cx, cy);
-  sx2.lineTo(cx - dd, cy + dd);
-  sx2.stroke();
-  sx2.beginPath();
-  sx2.moveTo(cx, cy);
-  sx2.lineTo(cx + dd, cy + dd);
-  sx2.stroke();
-  sx2.globalCompositeOperation = 'source-over';
-  const soft = document.createElement('canvas');
-  soft.width = soft.height = S;
-  const s3 = soft.getContext('2d');
-  s3.filter = 'blur(12px)';
-  s3.drawImage(seg, 0, 0);
-  s3.filter = 'none';
-  const img = s3.getImageData(0, 0, S, S);
-  const dpx = img.data;
-  for (let i = 3; i < dpx.length; i += 4) dpx[i] = dpx[i] > 140 ? 255 : 0;
-  s3.putImageData(img, 0, 0);
-  s3.globalCompositeOperation = 'source-in';
-  s3.fillStyle = '#fdf2c0'; // flat cream-yellow, like the logo art
-  s3.fillRect(0, 0, S, S);
-  // deep-gold backing behind the logo so the peace gaps read as a darker
-  // warm glow (never blue sky), matching the logo art
-  g = x.createRadialGradient(cx, cy, 0, cx, cy, 150);
-  g.addColorStop(0, '#f3d084');
-  g.addColorStop(0.8, '#f6d890');
-  g.addColorStop(0.94, 'rgba(246,216,144,0.7)');
-  g.addColorStop(1, 'rgba(246,216,144,0)');
-  x.fillStyle = g;
-  x.beginPath();
-  x.arc(cx, cy, 150, 0, Math.PI * 2);
-  x.fill();
-  x.save();
-  x.shadowColor = 'rgba(255,240,170,0.95)';
-  x.shadowBlur = 40;
-  x.filter = 'blur(1px)';
-  x.drawImage(soft, 0, 0);
-  x.restore();
-
-  const tex = new THREE.CanvasTexture(c);
+  // the supplied sun logo image (2000x2040), used as-is — glow, rays, and
+  // peace mark all baked into the file
+  const tex = new THREE.TextureLoader().load('./sun.png');
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
   const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
   spr.position.copy(pos);
-  spr.scale.set(480, 480, 1);
+  spr.scale.set(850, 867, 1);
   return spr;
 }
 
