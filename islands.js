@@ -10,25 +10,25 @@ export const ISLANDS = [
     x: 384, z: -256, r: 55, sx: 1.0, sz: 1.0,
     lobes: [{ dx: 0.55, dz: 0.35, r: 0.5, grass: true }],
     title: 'about',
-    text: 'the pacific charitable fund is a charity foundation directing money where the waves need it most — to farmed animals. we fund the people and projects working every day to make their lives better.',
+    text: 'pacific charitable fund supports thoughtful, high-impact work to end factory farming and other forms of animal exploitation, creating a better world for animals, people, and the planet.',
   },
   {
     x: -496, z: -384, r: 70, sx: 1.45, sz: 0.75,
     lobes: [],
     title: 'values',
-    text: 'compassion, transparency, and impact. every donation is a pebble dropped in the water — we make sure the ripples reach the animals who need them.',
+    text: 'animals first, impact driven, and open to what works. we look for ideas that can create efficient, scalable, and long-lasting progress toward ending animal exploitation.',
   },
   {
     x: 120, z: -704, r: 45, sx: 0.8, sz: 1.35,
     lobes: [{ dx: -0.3, dz: 0.55, r: 0.45, grass: false }],
     title: 'team',
-    text: "we're a small crew of grantmakers, researchers, and advocates who believe farmed animals deserve a peaceful world. one ocean, one mission.",
+    text: "we're a small team of animal advocates bringing together experience in research, philanthropy, technology, and advocacy, all working toward a world free from animal exploitation.",
   },
   {
     x: -304, z: 496, r: 60, sx: 1.2, sz: 0.95,
     lobes: [{ dx: 0.5, dz: -0.4, r: 0.55, grass: true }],
     title: 'projects',
-    text: 'we support sanctuaries, advocacy groups, and effective charities helping farmed animals — from rescue to research. explore who we fund, and why it matters.',
+    text: 'we support many paths toward ending animal exploitation — from grassroots activism, investigations, legal advocacy, and policy reform to research, technology, alternative proteins, journalism, and movement building.',
   },
   {
     x: 680, z: 304, r: 50, sx: 1.0, sz: 1.1,
@@ -37,7 +37,7 @@ export const ISLANDS = [
       { dx: 0.5, dz: 0.45, r: 0.38, grass: false },
     ],
     title: 'contact',
-    text: "want to donate, apply for funding, or just say hi? we'd love to hear from you — drop us a line and let's make waves for farmed animals together.",
+    text: "we don't accept unsolicited emails at this time, but we appreciate your interest",
   },
 ];
 
@@ -127,7 +127,7 @@ export function makeFlag() {
     const s = Math.min((c.width - m * 2) / img.width, (c.height - m * 2) / img.height);
     const w = img.width * s;
     const h = img.height * s;
-    x2.drawImage(img, (c.width - w) / 2, (c.height - h) / 2, w, h);
+    x2.drawImage(img, (c.width - w) / 2 - 18, (c.height - h) / 2, w, h);
     tex.needsUpdate = true;
   };
   img.src = './flag-logo.png';
