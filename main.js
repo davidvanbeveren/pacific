@@ -105,29 +105,24 @@ function drawMap() {
   mapCtx.fillText('s', C, S - 8);
   mapCtx.fillText('e', S - 8, C);
   mapCtx.fillText('w', 8, C);
+  const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   for (const isl of ISLANDS) {
     const mx = C + isl.x * scale;
     const my = C + isl.z * scale;
-    const rx = Math.max(4.5, isl.r * 1.15 * isl.sx * scale);
-    const rz = Math.max(4.5, isl.r * 1.15 * isl.sz * scale);
-    mapCtx.fillStyle = '#ecd9a4';
-    mapCtx.beginPath();
-    mapCtx.ellipse(mx, my, rx, rz, 0, 0, Math.PI * 2);
-    mapCtx.fill();
-    mapCtx.fillStyle = '#57b56a';
-    mapCtx.beginPath();
-    mapCtx.ellipse(mx, my, rx * 0.55, rz * 0.55, 0, 0, Math.PI * 2);
-    mapCtx.fill();
-    mapCtx.fillStyle = 'rgba(20,80,126,0.85)';
+    const px = Math.max(14, isl.rMax * scale * 2.2);
+    mapCtx.font = `${Math.round(px)}px ${EMOJI_FONT}`;
+    mapCtx.fillText('🌴', mx, my);
+    mapCtx.fillStyle = '#ffffff';
     mapCtx.font = '600 8px -apple-system, sans-serif';
-    mapCtx.fillText(isl.title, mx, my - rz - 5);
+    mapCtx.shadowColor = 'rgba(20,80,126,0.6)';
+    mapCtx.shadowBlur = 2;
+    mapCtx.fillText(isl.title, mx, my + px * 0.72);
+    mapCtx.shadowBlur = 0;
   }
-  mapCtx.fillStyle = '#e6b53f';
+  mapCtx.font = `10px ${EMOJI_FONT}`;
   for (const c of treasure.chests) {
     if (c.taken) continue;
-    mapCtx.beginPath();
-    mapCtx.arc(C + c.x * scale, C + c.z * scale, 2, 0, Math.PI * 2);
-    mapCtx.fill();
+    mapCtx.fillText('🎁', C + c.x * scale, C + c.z * scale);
   }
   // boat arrow, pointing along its heading
   mapCtx.save();
