@@ -127,7 +127,7 @@ export function makeFlag() {
     const s = Math.min((c.width - m * 2) / img.width, (c.height - m * 2) / img.height);
     const w = img.width * s;
     const h = img.height * s;
-    x2.drawImage(img, (c.width - w) / 2 - 18, (c.height - h) / 2, w, h);
+    x2.drawImage(img, (c.width - w) / 2 - 54, (c.height - h) / 2, w, h);
     tex.needsUpdate = true;
   };
   img.src = './flag-logo.png';
